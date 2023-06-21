@@ -1,5 +1,14 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue';
+const { loginWithRedirect,logout, user, isAuthenticated } = useAuth0();
+    const login= ($event) => {
+    $event.preventDefault();
+        loginWithRedirect();
+      }
+      const logOut =() =>{
+        logout({ logoutParams: { returnTo: window.location.origin } })
+      }
 </script>
 
 <template>
@@ -10,10 +19,15 @@ import { RouterLink, RouterView } from 'vue-router'
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/dashboard" v-if="isAuthenticated">Dashboard</RouterLink>
       </nav>
+      <div class="authentication">
+        <button v-if="!isAuthenticated" @click="login">Login</button>
+        <button v-if="isAuthenticated" @click="logOut">Logout</button>
+      </div>
     </div>
-  </header>
 
+  </header>
   <RouterView />
 </template>
 
@@ -21,7 +35,16 @@ import { RouterLink, RouterView } from 'vue-router'
 header {
   max-height: 100vh;
 }
+.wrapper{
+  display: flex;
 
+}
+.authentication{
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+
+}
 .logo {
   display: block;
   margin: 0 auto 2rem;

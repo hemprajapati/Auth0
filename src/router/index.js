@@ -1,28 +1,39 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuth0 } from "@auth0/auth0-vue";
+import HomeView from "../views/HomeView.vue";
+const checkIsAuthenticated = (to, from, next) => {
+  // console.log(to,from)
+  const { user, isAuthenticated } = useAuth0();
+  console.log(user, isAuthenticated.value);
+  if (isAuthenticated.value) {
+    return next();
+  }
+};
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView
+      path: "/",
+      name: "home",
+      component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
-    }
-  ]
-})
-router.beforeEach((to, from, next) => {
-  if (to.name == 'callback') { // check if "to"-route is "callback" and allow access
-    next()
-  } else if (router.app.$auth.isAuthenticated()) { // if authenticated allow access
-    next()
-  } else { // trigger auth0's login.
-    router.app.$auth.login()
-  }
-})
-export default router
+      path: "/about",
+      name: "about",
+      component: () => import("../views/AboutView.vue"),
+    },
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      beforeEnter: checkIsAuthenticated,
+      component: () => import("../views/Dashbord.vue"),
+    },
+    {
+      path: "/callback",
+      name: "callback",
+      component: () => import("../views/callBack.vue"),
+    },
+  ],
+});
+
+export default router;
